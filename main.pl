@@ -1,10 +1,14 @@
 use Net::MQTT::Simple;
 use LWP::UserAgent;
  
-my $mqtt = Net::MQTT::Simple->new("test.mosquitto.org");
+my $MQTT_URL = $ENV{MQTT_URL};
+my $TOPIC = $ENV{TOPIC};
+my $BASE_URL = $ENV{BASE_URL};
+
+my $mqtt = Net::MQTT::Simple->new($MQTT_URL);
 
 $mqtt->run(
-    "9604123" => sub {
+    $TOPIC => sub {
         my ($topic, $message) = @_;
 		flipStatus($message);
     }
@@ -13,7 +17,7 @@ $mqtt->run(
 sub flipStatus{
 	my $vehicle = $_[0];
 	print "updated Vehicle $vehicle \n";
-	my $url = "http://localhost:8080/vehicle/$vehicle/status";
+	my $url = "$BASE_URL/vehicle/$vehicle/status";
 	my $ua = LWP::UserAgent->new;
 	$ua->put( $url );
 	return;
